@@ -2,48 +2,46 @@
 "use server";
 
 import { createServerClient } from "@/app/utils/server";
+import { FormValue } from "./page";
 
-// type StudyInput = {
-//   duration: number;
-//   description: string;
-// };
-
-export async function registerStudies(_: any, formData: FormData) {
-  console.log("FormDataの内容:");
-  formData.forEach((value, key) => {
-    console.log(`${key}: ${value}`);
-  });
-
+export async function registerStudies(_: any, formData: FormValue) {
   const supabase = createServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   // const user = (await supabase.auth.getUser()).data.user;
 
+  console.log(`cookiesのユーザー情報：`);
   console.log(user);
 
   if (!user) {
     return { success: false, message: "ログインしてください" };
   }
+  console.log("formDataの中身");
+  console.log(formData);
 
-  const duration = Number(formData.get("duration"));
-  const description = formData.get("description")?.toString() || "";
+  const sessions = formData.sessions;
 
-  if (isNaN(duration) || !description) {
-    return { success: false, message: "全ての項目を入力してください" };
-  }
+  const insertData = sessions.map((session) => ({
+    user_id: user.id,
+    title: session.title,
+    category: session.category,
+    start_time: session.start_time,
+    end_time: session.end_time,
+    study_duration: Number(session.study_duration),
+    memo: session.memo,
+  }));
 
-  const { error } = await supabase.from("study_logs").insert([
-    {
-      user_id: user.id,
-      study_duration: duration,
-      memo: description,
-    },
-  ]);
+  try {
+    const { error } = await supabase.from("study_logs").insert(insertData);
 
-  if (error) {
-    console.error(error);
-    return { success: false, message: "登録に失敗しました" };
+    if (error) {
+      console.error(error);
+      return { success: false, message: "登録に失敗しました" };
+    }
+  } catch (e) {
+    console.error(e);
+    return { success: false, message: "良きせぬエラーが発生しました" };
   }
 
   return { success: true, message: "登録完了しました！" };
