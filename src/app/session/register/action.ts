@@ -1,11 +1,11 @@
 // app/session/register/action.ts
 "use server";
 
-import { createServerClient } from "@/app/utils/server";
+import { createClientServer } from "@/app/utils/server";
 import { FormValue } from "./page";
 
 export async function registerStudies(_: any, formData: FormValue) {
-  const supabase = createServerClient();
+  const supabase = await createClientServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -30,6 +30,7 @@ export async function registerStudies(_: any, formData: FormValue) {
     end_time: session.end_time,
     study_duration: Number(session.study_duration),
     memo: session.memo,
+    date: session.start_time.split("T")[0],
   }));
 
   try {

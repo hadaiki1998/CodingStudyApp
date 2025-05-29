@@ -1,14 +1,14 @@
 // auth/action.ts
 "use server";
 
-import { createServerClient } from "@/app/utils/server";
+import { createClientServer } from "@/app/utils/server";
 // import { redirect } from "next/navigation";
 
 export async function registerUser(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const supabase = createServerClient();
+  const supabase = await createClientServer();
   const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email,
     password,
