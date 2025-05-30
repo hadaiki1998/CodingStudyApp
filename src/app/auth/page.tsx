@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { registerUser } from "./action"; // Server Actionをimport
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -39,6 +40,11 @@ export default function SignUpPage() {
         登録
       </Button>
       <p className="mt-2">{msg}</p>
+      <Link href="/session/register" className="text-2xl  text-red-400">
+        <Button className="border-2 bg-blue-600">
+          学習セッション登録ページへ
+        </Button>
+      </Link>
     </div>
   );
 }
